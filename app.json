@@ -19,7 +19,12 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
+<<<<<<< HEAD
       "predictiveBackGestureEnabled": false
+=======
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.saudehabitos"
+>>>>>>> 9d1785fd7281486e8128910bf23887d951d2c551
     },
     "web": {
       "output": "static",

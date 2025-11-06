@@ -16,23 +16,35 @@ export default function HomeView() {
         <Text style={styles.cardDesc}>Gerencie suas informações pessoais, preferências e notificações.</Text>
       </Pressable>
 
+<<<<<<< HEAD
       {/* 🔹 ENTIDADE HÁBITOS */}
       <Pressable style={[styles.card, styles.cardHabitos]} onPress={()=>router.push(router.push("/view/habitosView")
 )}>
+=======
+      <Pressable style={[styles.card, styles.cardHabitos]} onPress={() => router.push("view/habitosView")}>
+>>>>>>> 9d1785fd7281486e8128910bf23887d951d2c551
         <Text style={styles.cardIcon}>🌱</Text>
         <Text style={styles.cardTitle}>Hábitos</Text>
         <Text style={styles.cardDesc}>Crie e acompanhe bons hábitos para melhorar sua rotina e bem-estar.</Text>
       </Pressable>
 
+<<<<<<< HEAD
       {/* 🔹 ENTIDADE REGISTRO DE ATIVIDADES */}
       <Pressable style={[styles.card, styles.cardRegistro]} onPress={()=>router.push("/view/registroAtividadeView")}>
+=======
+      <Pressable style={[styles.card, styles.cardRegistro]} onPress={() => router.push("view/registroAtividadeView")}>
+>>>>>>> 9d1785fd7281486e8128910bf23887d951d2c551
         <Text style={styles.cardIcon}>🗓️</Text>
         <Text style={styles.cardTitle}>Registro de Atividades</Text>
         <Text style={styles.cardDesc}>Anote e acompanhe suas atividades diárias, metas e progresso.</Text>
       </Pressable>
 
+<<<<<<< HEAD
       {/* 🔹 ENTIDADE ATIVIDADE FÍSICA */}
       <Pressable style={[styles.card, styles.cardTreino]} onPress={()=>router.push("/view/atividadeFisicaView")}>
+=======
+      <Pressable style={[styles.card, styles.cardTreino]} onPress={() => router.push("view/atividadeFisicaView")}>
+>>>>>>> 9d1785fd7281486e8128910bf23887d951d2c551
         <Text style={styles.cardIcon}>💪</Text>
         <Text style={styles.cardTitle}>Atividade Física / Treino</Text>
         <Text style={styles.cardDesc}>Monte seu plano de treino e registre seus exercícios físicos.</Text>

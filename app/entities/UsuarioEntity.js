@@ -24,9 +24,14 @@ export default class UsuarioEntity {
     this.notificacoes = notificacoes;
   }
 
+<<<<<<< HEAD
   static fromDto(d){ 
     return d ? new UsuarioEntity(d) : null; }
   
     get key()
   { return String(this.id); }
+=======
+  static fromDto(d){ return d ? new UsuarioEntity(d) : null; }
+  get key(){ return String(this.id); }
+>>>>>>> 9d1785fd7281486e8128910bf23887d951d2c551
 }

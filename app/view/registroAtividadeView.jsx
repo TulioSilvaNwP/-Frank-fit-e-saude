@@ -2,7 +2,11 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
+<<<<<<< HEAD
 import RegistroAtividadeEntity from "../entities/RegistroAtividadeEntity";
+=======
+import RegistroAtividadeEntity from "../entities/AtividadeFisicaEntity";
+>>>>>>> 9d1785fd7281486e8128910bf23887d951d2c551
 import RegistroAtividadeService from "../services/registroAtividadeService";
 
 export default function RegistroAtividadeView() {

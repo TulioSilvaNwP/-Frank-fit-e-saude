@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import AtividadeFisicaEntity from "../entities/AtividadeFisicaEntity";
+<<<<<<< HEAD
 import AtividadeFisicaService from "../services/atividadeFisicaService";
+=======
+import AtividadeFisicaService from "../services/atividadeFisicaServices";
+>>>>>>> 9d1785fd7281486e8128910bf23887d951d2c551
 
 export default function AtividadeFisicaView() {
   const router = useRouter();
