@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
@@ -49,7 +48,6 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-=======
 # 🩺 Saúde e Hábitos
 
 Aplicativo desenvolvido em **React Native com Expo Router** para o gerenciamento de **hábitos, atividades físicas e bem-estar pessoal**.
@@ -122,4 +120,3 @@ Os dados são armazenados localmente com `AsyncStorage`, garantindo persistênci
 | `npm run web`           | Executa no navegador                |
 | `npm run lint`          | Roda o lint para verificar o código |
 | `npm run reset-project` | Limpa caches e reseta o projeto     |
->>>>>>> 9d1785fd7281486e8128910bf23887d951d2c551
