@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Cores do seu Design System */
+  --sandow-gray10: #f3f3f4;
+  --sandow-gray100: #111214;
+  --sandow-gray80: #393c43;
+  --sandow-graywhite: #ffffff;
+  --primary-orange: #f97316;
+  --text-gray: #676b74;
+  --border-color: #E0E0E0;
+  
+  /* Fontes */
+  --font-main: "Work Sans", Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  background-color: var(--sandow-graywhite);
+}
+
+.logar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--sandow-graywhite);
+  padding-bottom: 20px;
+}
+
+/* Área da Imagem de Topo */
+.frame-container {
+  width: 100%;
+  height: 280px; /* Levemente reduzido de 300 para 280 para ganhar espaço */
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px; /* Reduzido margem inferior */
+  background-color: #e5e5e5;
+}
+
+.background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.overlay-icon {
+  position: relative;
+  z-index: 10;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.overlay-icon img, .overlay-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* Área do Formulário */
+.frame-2 {
+  width: 100%;
+  max-width: 375px;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  /* Gap reduzido (era 32px) para caber tudo no cadastro */
+  gap: 16px; 
+}
+
+.frame-3 {
+  display: flex;
+  flex-direction: column;
+  /* Gap entre inputs reduzido (era 24px) */
+  gap: 16px; 
+  width: 100%;
+}
+
+/* Inputs */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Reduzido levemente */
+}
+
+.input-label {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sandow-gray100);
+  margin-left: 4px;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: var(--sandow-gray10);
+  border-radius: 12px;
+  padding: 0 16px; /* Padding lateral mantido, vertical removido pois usaremos height fixo */
+  height: 48px; /* Altura fixa mais compacta (padrão costuma ser 56px) */
+  gap: 10px;
+  transition: outline 0.2s;
+}
+
+.input-wrapper:focus-within {
+  outline: 2px solid var(--primary-orange);
+}
+
+.input-field {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-main);
+  font-size: 16px;
+  color: var(--sandow-gray100);
+  width: 100%;
+}
+
+/* Ícones */
+.icon-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sandow-gray80);
+  min-width: 24px; /* Garante espaço para o ícone não "sumir" */
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Botão Principal */
+.button-primary-icon {
+  width: 100%;
+  background-color: var(--sandow-gray100);
+  color: white;
+  padding: 16px; /* Levemente reduzido */
+  border-radius: 12px;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-top: 8px; /* Reduzido */
+  transition: opacity 0.2s;
+}
+
+.button-primary-icon:hover {
+  opacity: 0.9;
+}
+
+/* Rodapé */
+.don-t-have-an-wrapper {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.don-t-have-an {
+  font-size: 14px;
+  color: var(--text-gray);
+}
+
+.text-wrapper-2 {
+  color: var(--primary-orange);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+/* === ESTILOS ESPECÍFICOS DE CADASTRO === */
+
+/* Grid de 3 colunas para Idade, Peso e Altura */
+.form-grid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px; /* Espaço entre os quadradinhos */
+}
+
+/* Centralizar texto nos inputs pequenos */
+.text-center-input .input-field {
+  text-align: center;
+}
+
+/* Ajuste para telas muito pequenas (tipo iPhone SE antigo) */
+@media (max-height: 700px) {
+    .frame-container {
+        height: 200px;
+    }
+    .overlay-icon {
+        width: 60px;
+        height: 60px;
+    }
+}
