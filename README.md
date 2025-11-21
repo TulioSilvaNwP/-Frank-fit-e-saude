@@ -120,3 +120,9 @@ Os dados são armazenados localmente com `AsyncStorage`, garantindo persistênci
 | `npm run web`           | Executa no navegador                |
 | `npm run lint`          | Roda o lint para verificar o código |
 | `npm run reset-project` | Limpa caches e reseta o projeto     |
+
+
+## 📊 Apresentação do Trabalho
+
+A apresentação foi feita no Canva. Acesse aqui (somente visualização):  
+👉 [Ver apresentação no Canva](https://www.canva.com/design/DAG44yXpNYk/fiMkYA6xaPm-U2Dmd8-zvQ/edit?utm_content=DAG44yXpNYk&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
