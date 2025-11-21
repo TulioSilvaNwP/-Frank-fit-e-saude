@@ -8,9 +8,11 @@ import {
   ImageBackground,
   Dimensions,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import dicasService from '../services/dicasService';
 
 const { height } = Dimensions.get('window');
 
@@ -28,6 +30,21 @@ export default function NovasDicas() {
     setForm({ ...form, [field]: value });
   };
 
+  const handleSalvar = async () => {
+    if (!form.titulo || !form.descricao) {
+      Alert.alert('Atenção', 'Preencha pelo menos Título e Descrição.');
+      return;
+    }
+
+    try {
+      await dicasService.adicionar(form);
+      navigation.navigate('Dicas');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Não foi possível salvar a dica.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView 
@@ -35,7 +52,6 @@ export default function NovasDicas() {
         style={{ flex: 1 }}
       >
         
-        {/* CABEÇALHO COM IMAGEM (Tema: Alimentação/Saúde) */}
         <ImageBackground 
           source={{ uri: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1453&auto=format&fit=crop' }} 
           style={styles.headerImage}
@@ -47,47 +63,44 @@ export default function NovasDicas() {
           </View>
         </ImageBackground>
 
-        {/* CONTEÚDO BRANCO ARREDONDADO */}
         <View style={styles.contentContainer}>
           <View style={styles.headerTexts}>
-            <Text style={styles.title}>Conteúdos</Text>
-            <Text style={styles.subtitle}>Adicione novos Conteúdos</Text>
+            <Text style={styles.title}>Dicas</Text>
+            <Text style={styles.subtitle}>Adicione novas Dicas</Text>
           </View>
 
-          {/* FORMULÁRIO COM DISTRIBUIÇÃO VERTICAL AUTOMÁTICA */}
           <View style={styles.form}>
             
-            {/* Tipo */}
             <View style={styles.inputGroup}>
                 <InputLabel label="Tipo:" />
                 <TextInput 
                   style={styles.input} 
                   value={form.tipo}
                   onChangeText={(t) => handleChange('tipo', t)}
+                  placeholder="Ex: Saúde, Lazer"
                 />
             </View>
 
-            {/* Título */}
             <View style={styles.inputGroup}>
                 <InputLabel label="Título:" />
                 <TextInput 
                   style={styles.input} 
                   value={form.titulo}
                   onChangeText={(t) => handleChange('titulo', t)}
+                  placeholder="Ex: Beber Água"
                 />
             </View>
 
-            {/* Descrição */}
             <View style={styles.inputGroup}>
                 <InputLabel label="Descrição:" />
                 <TextInput 
                   style={styles.input} 
                   value={form.descricao}
                   onChangeText={(t) => handleChange('descricao', t)}
+                  placeholder="Ex: 2L por dia"
                 />
             </View>
 
-            {/* Fonte (Opcional) */}
             <View style={styles.inputGroup}>
                 <InputLabel label="Fonte (Opcional):" />
                 <TextInput 
@@ -97,17 +110,16 @@ export default function NovasDicas() {
                 />
             </View>
 
-            {/* BOTÕES EMPILHADOS */}
             <View style={styles.footerButtons}>
               <TouchableOpacity 
                 style={styles.button} 
                 onPress={() => navigation.navigate('Dicas')}
               >
-                <Text style={styles.buttonText}>Seus Conteúdos →</Text>
+                <Text style={styles.buttonText}>Suas Dicas →</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Adicionar Conteúdo</Text>
+              <TouchableOpacity style={styles.button} onPress={handleSalvar}>
+                <Text style={styles.buttonText}>Adicionar Dicas</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -128,11 +140,11 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     width: '100%',
-    height: height * 0.22, // 22% da tela
+    height: height * 0.22, 
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Overlay leve
+    backgroundColor: 'rgba(255, 255, 255, 0.1)', 
     paddingTop: 40, 
     paddingLeft: 20,
   },
@@ -177,7 +189,7 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 1,
-    justifyContent: 'space-evenly', // Distribui igualmente na tela
+    justifyContent: 'space-evenly', 
   },
   inputGroup: {
     marginBottom: 5, 
@@ -203,7 +215,7 @@ const styles = StyleSheet.create({
     gap: 12, 
   },
   button: {
-    backgroundColor: '#F97316', // Laranja
+    backgroundColor: '#F97316', 
     height: 50,
     borderRadius: 25,
     alignItems: 'center',

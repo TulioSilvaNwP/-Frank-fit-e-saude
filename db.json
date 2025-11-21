@@ -1,0 +1,56 @@
+{
+  "atividades": [
+    {
+      "id": "1",
+      "tipo": "Corrida",
+      "intensidade": "Alta",
+      "duracao": "30 min",
+      "data": "20/11/2025",
+      "observacoes": "Teste inicial"
+    },
+    {
+      "id": null,
+      "tipo": "teste",
+      "intensidade": "alta",
+      "data": "31/03/2025",
+      "calorias": "",
+      "observacoes": ""
+    }
+  ],
+  "dicas": [
+    {
+      "id": "1",
+      "tipo": "Saúde",
+      "titulo": "Beba Água",
+      "descricao": "Pelo menos 2L por dia.",
+      "fonte": "OMS"
+    },
+    {
+      "id": "1763674187225",
+      "tipo": "teste",
+      "titulo": "teste",
+      "descricao": "teste",
+      "fonte": ""
+    }
+  ],
+  "habitos": [
+    {
+      "id": null,
+      "nome": "Ler",
+      "descricao": "LEr",
+      "frequencia": "Diaria",
+      "horario": "20",
+      "icone": null
+    }
+  ],
+  "humores": [
+    {
+      "id": null,
+      "sentimento": "Feliz",
+      "data": "09:00 20/11/2025",
+      "icone": "",
+      "descricao": ""
+    }
+  ],
+  "perfil": []
+}

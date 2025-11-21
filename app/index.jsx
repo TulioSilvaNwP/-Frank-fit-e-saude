@@ -8,7 +8,8 @@ import {
   Image, 
   ImageBackground, 
   ScrollView,
-  Dimensions
+  Dimensions,
+  StatusBar
 } from 'react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -36,7 +37,8 @@ import NovasDicas from './pages/novasdicas';
 import Humor from './pages/humor';
 import NovoHumor from './pages/novohumor';
 
-// --- IMPORTAÇÃO DO DRAWER (SIDEBAR) ---
+// --- IMPORTAÇÃO DO DRAWER CUSTOMIZADO ---
+// Certifique-se de que este arquivo existe no seu projeto
 import CustomDrawerContent from './components/CustomDrawerContent'; 
 
 const { height } = Dimensions.get('window');
@@ -44,26 +46,19 @@ const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 const RootStack = createStackNavigator(); 
 
-// --- MOCK COMPONENTS ---
-const PlaceholderScreen = ({ name }) => (
-  <View style={styles.centerScreen}>
-    <Text style={{fontSize: 18, fontWeight: 'bold', color: '#333'}}>{name}</Text>
-  </View>
-);
-
-// --- CUSTOM HEADER ---
+// --- COMPONENTE DE CABEÇALHO PERSONALIZADO ---
 const CustomHeader = ({ title, showBackButton, navigation }) => (
   <View style={styles.headerContainer}>
     {showBackButton && (
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.headerText}>←</Text>
+        <Text style={styles.headerBackArrow}>←</Text>
       </TouchableOpacity>
     )}
     <Text style={styles.headerTitle}>{title}</Text>
   </View>
 );
 
-// --- COMPONENTE DE INPUT ---
+// --- COMPONENTE DE INPUT REUTILIZÁVEL ---
 const InputText = ({ label, isPassword, value, onChange, placeholder, keyboardType }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
@@ -106,11 +101,13 @@ function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       <ImageBackground 
         source={{ uri: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop" }} 
         style={styles.backgroundImage}
       >
         <View style={styles.overlayIcon}>
+           {/* ÍCONE RESTAURADO CONFORME SOLICITADO */}
            <Image 
              source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1077/1077035.png' }} 
              style={{ width: 80, height: 80, tintColor: '#F97316' }} 
@@ -120,15 +117,17 @@ function LoginScreen({ navigation }) {
       </ImageBackground>
 
       <View style={styles.formContainer}>
-        <ScrollView contentContainerStyle={styles.scrollForm}>
+        <ScrollView contentContainerStyle={styles.scrollForm} showsVerticalScrollIndicator={false}>
+          <Text style={styles.loginTitle}>{modoCadastro ? "Crie sua conta" : "Bem-vindo de volta!"}</Text>
+          
           {modoCadastro && (
             <>
               <InputText label="Nome" placeholder="Seu nome" value={form.nome} onChange={(t) => handleChange("nome", t)} />
               <View style={styles.row}>
-                <View style={{flex: 1, marginRight: 5}}>
+                <View style={{flex: 1, marginRight: 10}}>
                     <InputText label="Idade" placeholder="00" keyboardType="numeric" value={form.idade} onChange={(t) => handleChange("idade", t)} />
                 </View>
-                <View style={{flex: 1, marginRight: 5}}>
+                <View style={{flex: 1, marginRight: 10}}>
                     <InputText label="Peso" placeholder="kg" keyboardType="numeric" value={form.peso} onChange={(t) => handleChange("peso", t)} />
                 </View>
                 <View style={{flex: 1}}>
@@ -157,7 +156,7 @@ function LoginScreen({ navigation }) {
   );
 }
 
-// --- NAVEGAÇÃO INTERNA (STACK) ---
+// --- STACK INTERNA (DEPOIS DO LOGIN) ---
 function MainStack() {
   return (
     <Stack.Navigator
@@ -170,7 +169,6 @@ function MainStack() {
     >
       <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
       
-      {/* --- AQUI ESTÁ A CORREÇÃO DO CABEÇALHO --- */}
       <Stack.Screen name="Perfil" component={Perfil} options={{ headerShown: false }} />
       
       <Stack.Screen name="Atividades" component={Atividades} options={{ headerShown: false }} />
@@ -188,15 +186,22 @@ function MainStack() {
   );
 }
 
-// --- NAVEGAÇÃO DRAWER (MENU LATERAL) ---
+// --- DRAWER NAVIGATION (MENU LATERAL) ---
 function DrawerNavigation() {
   return (
     <Drawer.Navigator
-        drawerContent={(props) => <CustomDrawerContent {...props} />}
+        drawerContent={(props) => {
+            // Tenta usar o CustomDrawerContent, se não existir, usa o padrão (fallback)
+            try {
+                return <CustomDrawerContent {...props} />;
+            } catch (e) {
+                return <DrawerContentScrollView {...props}><DrawerItemList {...props} /></DrawerContentScrollView>;
+            }
+        }}
         screenOptions={{
           headerShown: false,
-          drawerActiveTintColor: '#F97316', // Laranja ao selecionar
-          drawerInactiveTintColor: '#333',  // Cinza padrão
+          drawerActiveTintColor: '#F97316', 
+          drawerInactiveTintColor: '#333', 
           drawerStyle: { width: '80%', backgroundColor: '#FFF' },
           drawerLabelStyle: { marginLeft: -20, fontWeight: '500', fontSize: 15 },
           drawerItemStyle: { borderRadius: 10, paddingLeft: 10, marginVertical: 2 },
@@ -210,30 +215,34 @@ function DrawerNavigation() {
             }} 
         />
         <Drawer.Screen 
-            name="Atividades" 
+            name="AtividadesDrawer" 
             component={Atividades} 
             options={{ 
+                title: 'Atividades',
                 drawerIcon: ({color}) => <Image source={{uri: 'https://cdn-icons-png.flaticon.com/512/2928/2928755.png'}} style={{width: 20, height: 20, tintColor: color}} /> 
             }} 
         />
         <Drawer.Screen 
-            name="Hábitos" 
+            name="HabitosDrawer" 
             component={Habitos} 
             options={{ 
+                title: 'Hábitos',
                 drawerIcon: ({color}) => <Image source={{uri: 'https://cdn-icons-png.flaticon.com/512/25/25235.png'}} style={{width: 20, height: 20, tintColor: color}} /> 
             }} 
         />
         <Drawer.Screen 
-            name="Dicas" 
+            name="DicasDrawer" 
             component={Dicas} 
             options={{ 
+                title: 'Dicas',
                 drawerIcon: ({color}) => <Image source={{uri: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png'}} style={{width: 20, height: 20, tintColor: color}} /> 
             }} 
         />
         <Drawer.Screen 
-            name="Humor" 
+            name="HumorDrawer" 
             component={Humor} 
             options={{ 
+                title: 'Humor',
                 drawerIcon: ({color}) => <Image source={{uri: 'https://cdn-icons-png.flaticon.com/512/569/569501.png'}} style={{width: 20, height: 20, tintColor: color}} /> 
             }} 
         />
@@ -241,7 +250,7 @@ function DrawerNavigation() {
   );
 }
 
-// --- APP PRINCIPAL ---
+// --- APP PRINCIPAL (ROOT) ---
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -257,31 +266,41 @@ export default function App() {
   );
 }
 
-// --- ESTILOS DO INDEX ---
+// --- ESTILOS ---
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
-  centerScreen: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#333' },
   
+  // Header
   headerContainer: { 
-    height: 80, 
-    paddingTop: 30, 
+    height: 90, 
+    paddingTop: 40, 
     flexDirection: 'row', 
     alignItems: 'center', 
-    paddingHorizontal: 15, 
+    paddingHorizontal: 20, 
     backgroundColor: '#FFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE'
+    borderBottomColor: '#F3F4F6',
+    elevation: 2
   },
-  backButton: { padding: 5, marginRight: 10 },
-  headerText: { fontSize: 24, color: '#F97316' },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+  backButton: { padding: 8, marginRight: 10, borderRadius: 20, backgroundColor: '#F3F4F6' },
+  headerBackArrow: { fontSize: 20, color: '#F97316', fontWeight: 'bold' },
+  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#1F2937' },
 
-  backgroundImage: { height: height * 0.4, justifyContent: 'center', alignItems: 'center' },
-  overlayIcon: { backgroundColor: 'rgba(0,0,0,0.1)', padding: 20, borderRadius: 20 },
+  // Login Screen
+  backgroundImage: { 
+    height: height * 0.35, 
+    justifyContent: 'flex-end', 
+    alignItems: 'center',
+    paddingBottom: 40
+  },
+  overlayIcon: { 
+    backgroundColor: 'rgba(0,0,0,0.1)', 
+    padding: 20, 
+    borderRadius: 30, 
+  },
   formContainer: { 
     flex: 1, 
-    marginTop: -30, 
+    marginTop: -25, 
     backgroundColor: '#FFF', 
     borderTopLeftRadius: 30, 
     borderTopRightRadius: 30, 
@@ -293,38 +312,46 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
-  scrollForm: { paddingBottom: 30 },
+  scrollForm: { paddingBottom: 40 },
+  loginTitle: { fontSize: 26, fontWeight: 'bold', color: '#111', marginBottom: 20, textAlign: 'center' },
+  
+  // Inputs
   inputGroup: { marginBottom: 16 },
-  inputLabel: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 8 },
+  inputLabel: { fontSize: 14, fontWeight: '600', color: '#4B5563', marginBottom: 6 },
   inputWrapper: { 
     flexDirection: 'row', 
     alignItems: 'center', 
     borderWidth: 1, 
-    borderColor: '#D1D5DB', 
-    borderRadius: 12, 
-    paddingHorizontal: 12,
-    height: 48,
+    borderColor: '#E5E7EB', 
+    borderRadius: 14, 
+    paddingHorizontal: 14,
+    height: 52,
     backgroundColor: '#F9FAFB'
   },
-  inputField: { flex: 1, color: '#111' },
+  inputField: { flex: 1, color: '#111', fontSize: 16 },
   eyeIcon: { padding: 5 },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
+  
+  // Botões
   buttonPrimary: {
     flexDirection: 'row',
     backgroundColor: '#000',
-    height: 50,
-    borderRadius: 12,
+    height: 56,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 25,
     shadowColor: "#F97316",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
+    elevation: 6,
   },
-  buttonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold', marginRight: 10 },
-  arrowIcon: { color: '#F97316', fontSize: 20, fontWeight: 'bold' },
-  footerTextContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
-  footerText: { color: '#6B7280' },
-  linkText: { color: '#F97316', fontWeight: 'bold' },
+  buttonText: { color: '#FFF', fontSize: 18, fontWeight: 'bold', marginRight: 8 },
+  arrowIcon: { color: '#F97316', fontSize: 22, fontWeight: 'bold' },
+  
+  // Footer
+  footerTextContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 25 },
+  footerText: { color: '#6B7280', fontSize: 15 },
+  linkText: { color: '#F97316', fontWeight: 'bold', fontSize: 15 },
 });

@@ -1,70 +1,57 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
   StyleSheet, 
   ScrollView, 
   TouchableOpacity, 
-  Image 
+  Image, 
+  ActivityIndicator,
+  Dimensions
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import atividadesService from '../services/atividadesService';
 
-// Dados simulados
-const historicoData = [
-  { 
-    id: 1, 
-    titulo: 'Corrida', 
-    horario: '07:00', 
-    duracao: '45 min', 
-    calorias: '420 cal', 
-    intensidade: 'Moderada',
-    tagColor: '#E8D8B0', 
-    img: 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop' 
-  },
-  { 
-    id: 2, 
-    titulo: 'Musculação', 
-    horario: '06:00', 
-    duracao: '90 min', 
-    calorias: '480 cal', 
-    intensidade: 'Intensa',
-    tagColor: '#FDBA74', 
-    img: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1470&auto=format&fit=crop'
-  },
-  { 
-    id: 3, 
-    titulo: 'Yoga', 
-    horario: '08:00', 
-    duracao: '30 min', 
-    calorias: '150 cal', 
-    intensidade: 'Leve',
-    tagColor: '#F3E8D3', 
-    img: 'https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=1470&auto=format&fit=crop'
-  },
-  { 
-    id: 4, 
-    titulo: 'Musculação', 
-    horario: '06:00', 
-    duracao: '60 min', 
-    calorias: '380 cal', 
-    intensidade: 'Moderada',
-    tagColor: '#E8D8B0',
-    img: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1470&auto=format&fit=crop'
-  },
-  { 
-    id: 5, 
-    titulo: 'Yoga', 
-    horario: '08:00', 
-    duracao: '30 min', 
-    calorias: '150 cal', 
-    intensidade: 'Leve',
-    tagColor: '#F3E8D3',
-    img: 'https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?q=80&w=1469&auto=format&fit=crop'
-  },
-];
+const { height } = Dimensions.get('window');
 
 export default function Atividades() {
   const navigation = useNavigation();
+  const [listaAtividades, setListaAtividades] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarAtividades();
+    }, [])
+  );
+
+  const carregarAtividades = async () => {
+    try {
+      setLoading(true);
+      const dados = await atividadesService.getAll();
+      // Inverte para mostrar os mais recentes primeiro
+      setListaAtividades(dados.reverse());
+    } catch (error) {
+      console.error("Erro ao buscar atividades:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getImagemPorTipo = (tipo) => {
+    const tipoLower = tipo ? tipo.toLowerCase() : '';
+    if (tipoLower.includes('corrida')) return 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop';
+    if (tipoLower.includes('muscula')) return 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1470&auto=format&fit=crop';
+    if (tipoLower.includes('yoga')) return 'https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=1470&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1470&auto=format&fit=crop'; 
+  };
+
+  const getCorPorIntensidade = (intensidade) => {
+    const intLower = intensidade ? intensidade.toLowerCase() : '';
+    if (intLower === 'alta' || intLower === 'intensa') return '#F97316'; // Laranja forte
+    if (intLower === 'moderada') return '#FDBA74'; // Laranja médio
+    return '#FFEDD5'; // Laranja claro
+  };
 
   return (
     <View style={styles.container}>
@@ -82,43 +69,50 @@ export default function Atividades() {
           <View style={{ width: 40 }} /> 
         </View>
 
-        {/* LISTA */}
-        <View style={styles.listContainer}>
-          {historicoData.map((item) => (
-            <View key={item.id} style={styles.card}>
-              <Image source={{ uri: item.img }} style={styles.cardImage} />
-              
-              <View style={styles.cardMiddle}>
-                <Text style={styles.cardTitle}>{item.titulo}</Text>
-                <Text style={styles.cardSubtitle}>{item.horario} • {item.duracao}</Text>
-              </View>
+        {/* LOADING OU LISTA */}
+        {loading ? (
+          <ActivityIndicator size="large" color="#F97316" style={{ marginTop: 50 }} />
+        ) : (
+          <View style={styles.listContainer}>
+            {listaAtividades.length === 0 ? (
+                <Text style={styles.emptyText}>Nenhuma atividade registrada ainda.</Text>
+            ) : (
+                listaAtividades.map((item, index) => (
+                <View key={item.id || index} style={styles.card}>
+                    <Image 
+                        source={{ uri: getImagemPorTipo(item.tipo) }} 
+                        style={styles.cardImage} 
+                    />
+                    
+                    <View style={styles.cardMiddle}>
+                        <Text style={styles.cardTitle}>{item.tipo || 'Atividade'}</Text>
+                        <Text style={styles.cardSubtitle}>{item.data} • {item.duracao}</Text>
+                        {item.observacoes ? <Text style={styles.cardObs}>{item.observacoes}</Text> : null}
+                    </View>
 
-              <View style={styles.cardRight}>
-                <Text style={styles.cardCalories}>{item.calorias}</Text>
-                <View style={[styles.tagContainer, { backgroundColor: item.tagColor }]}>
-                  <Text style={styles.tagText}>{item.intensidade}</Text>
+                    <View style={styles.cardRight}>
+                        <View style={[styles.tagContainer, { backgroundColor: getCorPorIntensidade(item.intensidade) }]}>
+                            <Text style={styles.tagText}>{item.intensidade || 'N/A'}</Text>
+                        </View>
+                    </View>
                 </View>
-              </View>
-            </View>
-          ))}
-        </View>
+                ))
+            )}
+          </View>
+        )}
 
-        {/* FOOTER COM BOTÃO DE AÇÃO */}
+        {/* FOOTER */}
         <View style={styles.footerSection}>
           <Text style={styles.footerTitle}>Novas Atividades?</Text>
           <Text style={styles.footerSubtitle}>
-            Essas são suas Atividades mais recentes.
-          </Text>
-          <Text style={styles.footerSubtitle}>
-            Adicione novas ao seu histórico.
+            Mantenha seu histórico atualizado.
           </Text>
 
-          {/* BOTÃO REDIRECIONANDO PARA A TELA NOVAS ATIVIDADES */}
           <TouchableOpacity 
             style={styles.addButton}
             onPress={() => navigation.navigate('NovasAtividades')} 
           >
-            <Text style={styles.addButtonText}>Adicione Nova Atividade</Text>
+            <Text style={styles.addButtonText}>Adicionar Nova Atividade</Text>
             <Text style={styles.addButtonArrow}>→</Text>
           </TouchableOpacity>
         </View>
@@ -172,6 +166,12 @@ const styles = StyleSheet.create({
   listContainer: {
     marginBottom: 20,
   },
+  emptyText: {
+    textAlign: 'center',
+    color: '#999',
+    fontSize: 16,
+    marginTop: 20,
+  },
   card: {
     flexDirection: 'row',
     backgroundColor: '#FFF',
@@ -200,21 +200,23 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 4,
+    marginBottom: 2,
+    textTransform: 'capitalize',
   },
   cardSubtitle: {
     fontSize: 13,
-    color: '#9CA3AF',
+    color: '#666',
+  },
+  cardObs: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 2,
+    fontStyle: 'italic',
   },
   cardRight: {
     alignItems: 'flex-end',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     height: 45,
-  },
-  cardCalories: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
   },
   tagContainer: {
     paddingHorizontal: 10,
@@ -226,7 +228,8 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: '#555',
+    color: '#333',
+    textTransform: 'uppercase',
   },
   footerSection: {
     marginTop: 20,
@@ -234,17 +237,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   footerTitle: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: '900',
     color: '#111',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   footerSubtitle: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#777',
     textAlign: 'center',
-    lineHeight: 22,
-    fontWeight: '500',
+    marginBottom: 20,
   },
   addButton: {
     flexDirection: 'row',
@@ -254,7 +256,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 30,
     shadowColor: "#F97316",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

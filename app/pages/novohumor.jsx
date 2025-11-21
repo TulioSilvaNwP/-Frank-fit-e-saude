@@ -9,9 +9,12 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
-  ScrollView // Adicionado ScrollView para garantir que tudo caiba em telas menores
+  ScrollView,
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import humorService from '../services/humorService';
+import HumorEntity from '../entities/humorEntity';
 
 const { height } = Dimensions.get('window');
 
@@ -22,11 +25,40 @@ export default function NovoHumor() {
   const [data, setData] = useState('');
   const [descricao, setDescricao] = useState('');
 
+  const handleSalvar = async () => {
+    if (!sentimento || !data) {
+        Alert.alert('Atenção', 'Preencha como está se sentindo e a data.');
+        return;
+    }
+
+    try {
+        // Cria a entidade (ID null para ser gerado automaticamente)
+        const novoHumor = new HumorEntity(
+            null, 
+            sentimento,
+            data,
+            descricao
+        );
+
+        await humorService.create(novoHumor);
+        
+        Alert.alert('Registrado!', 'Seu humor foi salvo.');
+        setSentimento('');
+        setData('');
+        setDescricao('');
+        
+        // Navega de volta para a lista de Humor
+        navigation.navigate('Humor'); 
+    } catch (error) {
+        console.error(error);
+        Alert.alert('Erro', 'Não foi possível salvar o humor.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* CABEÇALHO CÉU AZUL */}
       <ImageBackground 
-        // Usando uma imagem de céu azul vibrante e confiável
         source={{ uri: 'https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=1468&auto=format&fit=crop' }} 
         style={styles.headerImage}
         resizeMode="cover"
@@ -61,7 +93,7 @@ export default function NovoHumor() {
                   <InputLabel label="Como você está se sentindo?" />
                   <TextInput 
                     style={styles.input} 
-                    placeholder="Ex: Feliz, cansado..."
+                    placeholder="Ex: Feliz, Cansado, Estressado"
                     value={sentimento}
                     onChangeText={setSentimento}
                     placeholderTextColor="#999"
@@ -69,10 +101,10 @@ export default function NovoHumor() {
               </View>
 
               <View style={styles.inputGroup}>
-                  <InputLabel label="Data:" />
+                  <InputLabel label="Data e Hora:" />
                   <TextInput 
                     style={styles.input} 
-                    placeholder="Hoje"
+                    placeholder="Ex: 09:00 • 20/11/2025"
                     value={data}
                     onChangeText={setData}
                     placeholderTextColor="#999"
@@ -83,7 +115,7 @@ export default function NovoHumor() {
                   <InputLabel label="Descrição (Opcional):" />
                   <TextInput 
                     style={[styles.input, styles.textArea]} 
-                    placeholder="Adicione detalhes..."
+                    placeholder="O que aconteceu hoje?"
                     value={descricao}
                     onChangeText={setDescricao}
                     multiline={true}
@@ -102,7 +134,7 @@ export default function NovoHumor() {
 
                 <TouchableOpacity 
                   style={styles.button}
-                  onPress={() => console.log("Salvar Humor")}
+                  onPress={handleSalvar}
                 >
                   <Text style={styles.buttonText}>Adicionar Humor</Text>
                 </TouchableOpacity>
@@ -128,15 +160,15 @@ const styles = StyleSheet.create({
   // --- Header Céu Azul ---
   headerImage: {
     width: '100%',
-    height: height * 0.35, // Aumentei um pouco para garantir que o céu apareça bem
+    height: height * 0.35, 
   },
   overlay: {
     flex: 1,
     paddingTop: 50, 
     paddingHorizontal: 20,
     justifyContent: 'space-between', 
-    paddingBottom: 50, // Espaço extra embaixo para o texto não ser cortado pelo container branco
-    backgroundColor: 'rgba(0,0,0,0.1)', // Leve escurecida para o texto branco estourar
+    paddingBottom: 50, 
+    backgroundColor: 'rgba(0,0,0,0.1)', 
   },
   backButton: {
     width: 40,
@@ -159,7 +191,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#FFF', 
     marginBottom: 5,
-    // Sombra no texto para garantir leitura contra nuvens
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: {width: 1, height: 1},
     textShadowRadius: 4,
@@ -182,13 +213,13 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 25,
-    overflow: 'hidden', // Garante que o conteúdo respeite as bordas arredondadas
+    overflow: 'hidden', 
   },
   scrollContent: {
     paddingTop: 30,
     paddingBottom: 20,
     flexGrow: 1,
-    justifyContent: 'space-between' // Empurra os botões para baixo se sobrar espaço
+    justifyContent: 'space-between' 
   },
   
   form: {
@@ -221,11 +252,11 @@ const styles = StyleSheet.create({
   
   // --- Botões ---
   footerButtons: {
-    marginTop: 30, // Espaço antes dos botões
+    marginTop: 30, 
     gap: 15, 
   },
   button: {
-    backgroundColor: '#F97316', // Laranja
+    backgroundColor: '#F97316', 
     height: 55,
     borderRadius: 30,
     alignItems: 'center',

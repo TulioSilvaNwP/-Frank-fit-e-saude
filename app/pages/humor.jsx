@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -6,55 +6,52 @@ import {
   TouchableOpacity, 
   Image,
   ScrollView,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import humorService from '../services/humorService';
 
 const { height } = Dimensions.get('window');
 
-// Dados simulados
-const historicoHumor = [
-  { 
-    id: 1, 
-    humor: 'Triste', 
-    data: '07:00 • 03/11/2025', 
-    icon: 'https://cdn-icons-png.flaticon.com/512/725/725099.png' 
-  },
-  { 
-    id: 2, 
-    humor: 'Animado', 
-    data: '06:00 • 02/11/2025', 
-    icon: 'https://cdn-icons-png.flaticon.com/512/1933/1933691.png' 
-  },
-  { 
-    id: 3, 
-    humor: 'Neutro', 
-    data: '08:00 • 01/11/2025', 
-    // ÍCONE CORRIGIDO NOVAMENTE: Rosto inexpressivo/neutro
-    icon: 'https://cdn-icons-png.flaticon.com/512/1933/1933011.png' 
-  },
-  { 
-    id: 4, 
-    humor: 'Cansado', 
-    data: '06:00 • 30/10/2025', 
-    icon: 'https://cdn-icons-png.flaticon.com/512/725/725116.png' 
-  },
-  { 
-    id: 5, 
-    humor: 'Feliz', 
-    data: '08:00 • 28/10/2025', 
-    icon: 'https://cdn-icons-png.flaticon.com/512/725/725107.png' 
-  },
-  { 
-    id: 6, 
-    humor: 'Estressado', 
-    data: '08:00 • 25/10/2025', 
-    icon: 'https://cdn-icons-png.flaticon.com/512/725/725095.png' 
-  },
-];
-
 export default function Humor() {
   const navigation = useNavigation();
+  const [listaHumores, setListaHumores] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarHumores();
+    }, [])
+  );
+
+  const carregarHumores = async () => {
+    try {
+      setLoading(true);
+      const dados = await humorService.getAll();
+      if (Array.isArray(dados)) {
+        setListaHumores(dados.reverse());
+      } else {
+        setListaHumores([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar humores:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Função auxiliar para tentar adivinhar o ícone pelo texto
+  const getIconBySentiment = (sentimento) => {
+    const s = sentimento ? sentimento.toLowerCase() : '';
+    if (s.includes('feliz') || s.includes('bem') || s.includes('ótimo')) return 'https://cdn-icons-png.flaticon.com/512/725/725107.png';
+    if (s.includes('triste') || s.includes('mal')) return 'https://cdn-icons-png.flaticon.com/512/725/725099.png';
+    if (s.includes('estress') || s.includes('bravo') || s.includes('raiva')) return 'https://cdn-icons-png.flaticon.com/512/725/725095.png';
+    if (s.includes('cansado') || s.includes('sono')) return 'https://cdn-icons-png.flaticon.com/512/725/725116.png';
+    if (s.includes('animado')) return 'https://cdn-icons-png.flaticon.com/512/1933/1933691.png';
+    // Ícone padrão (Neutro)
+    return 'https://cdn-icons-png.flaticon.com/512/1933/1933011.png'; 
+  };
 
   return (
     <View style={styles.container}>
@@ -68,36 +65,46 @@ export default function Humor() {
         <View style={{ width: 40 }} /> 
       </View>
 
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* LISTA DE CARDS */}
-        {historicoHumor.map((item) => (
-          <View key={item.id} style={styles.card}>
-            <Image source={{ uri: item.icon }} style={styles.emojiIcon} />
-            
-            <View style={styles.textContainer}>
-              <Text style={styles.moodTitle}>{item.humor}</Text>
-              <Text style={styles.moodDate}>{item.data}</Text>
-            </View>
-          </View>
-        ))}
+      {/* CONTEÚDO */}
+      <View style={{flex: 1}}>
+        {loading ? (
+             <ActivityIndicator size="large" color="#F97316" style={{marginTop: 50}} />
+        ) : (
+            <ScrollView 
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                {listaHumores.length === 0 ? (
+                    <Text style={styles.emptyText}>Nenhum registro de humor.</Text>
+                ) : (
+                    listaHumores.map((item, index) => (
+                    <View key={item.id || index} style={styles.card}>
+                        <Image source={{ uri: getIconBySentiment(item.sentimento) }} style={styles.emojiIcon} />
+                        
+                        <View style={styles.textContainer}>
+                            <Text style={styles.moodTitle}>{item.sentimento}</Text>
+                            <Text style={styles.moodDate}>{item.data}</Text>
+                            {item.descricao ? <Text style={styles.moodDesc}>{item.descricao}</Text> : null}
+                        </View>
+                    </View>
+                    ))
+                )}
 
-        {/* RODAPÉ COM BOTÃO */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Esses são seus Humores mais recentes.</Text>
-          
-          <TouchableOpacity 
-            style={styles.addButton}
-            onPress={() => navigation.navigate('NovosHumores')} 
-          >
-            <Text style={styles.addButtonText}>Adicione Humor</Text>
-            <Text style={styles.addButtonArrow}>→</Text>
-          </TouchableOpacity>
-        </View>
-        
-      </ScrollView>
+                {/* RODAPÉ COM BOTÃO */}
+                <View style={styles.footer}>
+                    <Text style={styles.footerText}>Esses são seus Humores mais recentes.</Text>
+                    
+                    <TouchableOpacity 
+                        style={styles.addButton}
+                        onPress={() => navigation.navigate('NovosHumores')} 
+                    >
+                        <Text style={styles.addButtonText}>Adicione Humor</Text>
+                        <Text style={styles.addButtonArrow}>→</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+        )}
+      </View>
     </View>
   );
 }
@@ -138,6 +145,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 30,
+    color: '#555',
+    fontSize: 16,
+  },
   card: {
     backgroundColor: '#FFF',
     borderRadius: 16,
@@ -165,11 +178,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 4,
+    marginBottom: 2,
+    textTransform: 'capitalize',
   },
   moodDate: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#9CA3AF', 
+    marginBottom: 2,
+  },
+  moodDesc: {
+    fontSize: 12,
+    color: '#555',
+    fontStyle: 'italic',
   },
   footer: {
     marginTop: 20,
